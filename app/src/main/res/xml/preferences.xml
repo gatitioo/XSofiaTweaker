@@ -14,6 +14,11 @@
 			android:key="pref_skip_channel_four"
 			android:summary="@string/skip_ch_four_sum"
 			android:title="@string/skip_ch_four_title" />
+		<SwitchPreference
+			android:defaultValue="false"
+			android:key="pref_enable_usb_dac"
+			android:summary="@string/enable_usb_dac_sum"
+			android:title="@string/enable_usb_dac_title" />
 	</PreferenceScreen>
 
 

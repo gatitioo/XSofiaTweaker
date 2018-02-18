@@ -11,6 +11,10 @@ class MySettings {
     public static final String ACTION_PREF_SKIP_CH_FOUR_CHANGED = "org.hvdw.xsofiatweaker.action.ACTION_PREF_SKIP_CH_FOUR_CHANGED";
     public static final String EXTRA_PREF_SKIP_CH_FOUR_ENABLED = "org.hvdw.xsofiatweaker.extra.PREF_SKIP_CH_FOUR_ENABLED";
 
+    public static final String ENABLE_USB_DAC = "pref_enable_usb_dac";
+    public static final String ACTION_ENABLE_USB_DAC_CHANGED = "org.hvdw.xsofiatweaker.action.ACTION_ENABLE_USB_DAC_CHANGED";
+    public static final String EXTRA_ENABLE_USB_DAC_ENABLED = "org.hvdw.xsofiatweaker.extra.ENABLE_USB_DAC_ENABLED";
+
     public static final String NAVI_CALL_OPTION = "navi_key_call_option";
     public static final String ACTION_NAVI_CALL_OPTION_CHANGED = "org.hvdw.xsofiatweaker.action.ACTION_NAVI_CALL_OPTION_CHANGED";
     public static final String EXTRA_NAVI_CALL_OPTION_STRING = "org.hvdw.xsofiatweaker.extra.PREF_NAVI_CALL_OPTION_STRING";

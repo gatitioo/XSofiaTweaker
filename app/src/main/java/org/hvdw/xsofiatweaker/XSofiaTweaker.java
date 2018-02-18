@@ -33,6 +33,7 @@ public class XSofiaTweaker implements IXposedHookZygoteInit, IXposedHookLoadPack
 
 	private boolean noKillEnabled;
 	private boolean skip_ch_four;
+	private boolean pref_enable_usb_dac;
 	private String navi_call_option;
 	private String navi_call_entry;
 	private String bt_phone_call_option;
@@ -68,6 +69,7 @@ public class XSofiaTweaker implements IXposedHookZygoteInit, IXposedHookLoadPack
 
 		noKillEnabled = sharedPreferences.getBoolean(MySettings.PREF_NO_KILL, true);
 		skip_ch_four = sharedPreferences.getBoolean(MySettings.PREF_SKIP_CH_FOUR, false);
+		pref_enable_usb_dac = sharedPreferences.getBoolean(MySettings.ENABLE_USB_DAC, false);
 		bt_phone_call_option = sharedPreferences.getString(MySettings.BT_PHONE_CALL_OPTION, "");
 		bt_phone_call_entry = sharedPreferences.getString(MySettings.BT_PHONE_CALL_ENTRY, "");
 		navi_call_option = sharedPreferences.getString(MySettings.NAVI_CALL_OPTION, "");
@@ -122,28 +124,71 @@ public class XSofiaTweaker implements IXposedHookZygoteInit, IXposedHookLoadPack
 		}
 
 
-		/* This should prevent the mute of audio channel 4 (alarm) which is used by Google voice for voice feedback 
-		*  This seems like a must-do switch on setting, but when no other channel is used it will give noise, although 
-		*  you won't hear that with the engine on */
-		if (skip_ch_four == true) {
-			findAndHookMethod("app.ToolkitApp", lpparam.classLoader, "setStreamVol", int.class, int.class, new XC_MethodHook() {
+		if ((skip_ch_four == true) || (pref_enable_usb_dac == true)) {
+		/* skip_ch_four and enable_usb_dac work on the same function....  */
+
+			/* This should prevent the mute of audio channel 4 (alarm) which is used by Google voice for voice feedback
+			*  This seems like a must-do switch on setting, but when no other channel is used it will give noise, although
+			*  you won't hear that with the engine on */
+			if (skip_ch_four == true) {
+				findAndHookMethod("app.ToolkitApp", lpparam.classLoader, "setStreamVol", int.class, int.class, new XC_MethodHook() {
+					@Override
+					protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
+						int stream = (int) param.args[0];
+						if (stream == 4) {
+							Context context = (Context) AndroidAppHelper.currentApplication();
+							XSharedPreferences sharedPreferences = new XSharedPreferences("org.hvdw.xsofiatweaker");
+							sharedPreferences.makeWorldReadable();
+							skip_ch_four = sharedPreferences.getBoolean(MySettings.PREF_SKIP_CH_FOUR, false);
+							XposedBridge.log(TAG + " skipping alarm channel 4 mute");
+							Log.d(TAG, " skipping alarm channel 4 mute");
+
+							param.setResult(null);
+						}
+					}
+				});
+			}
+
+			/* the skip_ch_four does one thing and then needs to skip the function
+			/* the enable_usb_dac only needs to skip the function */
+			if ((pref_enable_usb_dac == true) || (skip_ch_four == false)){
+				findAndHookMethod("app.ToolkitApp", lpparam.classLoader, "setStreamVol", int.class, int.class, new XC_MethodHook() {
+					@Override
+					protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
+
+							param.setResult(null);
+					}
+				});
+			}
+		}
+
+		/* The enable_usb_dac skip/uses 4 functions. The one above and the 3 below */
+		if (pref_enable_usb_dac == true) {
+			findAndHookMethod("module.main.HandlerMain", lpparam.classLoader, "mcuKeyVolUp()", new XC_MethodHook() {
 				@Override
 				protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
-					int stream = (int) param.args[0];
-					if (stream == 4) {
-						Context context = (Context) AndroidAppHelper.currentApplication();
-						XSharedPreferences sharedPreferences = new XSharedPreferences("org.hvdw.xsofiatweaker");
-						sharedPreferences.makeWorldReadable();
-						skip_ch_four = sharedPreferences.getBoolean(MySettings.PREF_SKIP_CH_FOUR, false);
-						XposedBridge.log(TAG + " skipping alarm channel 4 mute");
-						Log.d(TAG, " skipping alarm channel 4 mute");
+					setMediaVol(1);
+					param.setResult(null);
+				}
+			});
 
-						param.setResult(null);
-					}
+			findAndHookMethod("module.main.HandlerMain", lpparam.classLoader, "mcuKeyVolDown()", new XC_MethodHook() {
+				@Override
+				protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
+					setMediaVol(-1);
+					param.setResult(null);
+				}
+			});
+
+			/* Note that the MUTE hardware button overrules this function */
+			findAndHookMethod("module.main.HandlerMain", lpparam.classLoader, "mcuKeyVolMute()", new XC_MethodHook() {
+				@Override
+				protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
+					setMuteVol();
+					param.setResult(null);
 				}
 			});
 		}
-
 /**********************************************************************************************************************************************/
 		/* Below are the captured key functions */
 		findAndHookMethod("app.HandlerApp", lpparam.classLoader, "wakeup", new XC_MethodHook() {
@@ -303,7 +348,7 @@ public class XSofiaTweaker implements IXposedHookZygoteInit, IXposedHookLoadPack
 
 		findAndHookMethod("util.JumpPage", lpparam.classLoader, "broadcastByIntentName", String.class, new XC_MethodHook() {
 			@Override
-			protected void afterHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
+			protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
 				String actionName = (String) param.args[0];
 				Context context = (Context) AndroidAppHelper.currentApplication();
 				XSharedPreferences sharedPreferences = new XSharedPreferences("org.hvdw.xsofiatweaker");
@@ -356,8 +401,10 @@ public class XSofiaTweaker implements IXposedHookZygoteInit, IXposedHookLoadPack
 		}); */
 
 	}
-	/* End of the handleLoadPackage function doing the capture key functions */
 /**********************************************************************************************************************************************/
+/* End of the handleLoadPackage function doing the capture key functions */
+/**********************************************************************************************************************************************/
+/* Below the functions that take care of the actions to performa after a button has been pressed. */
 
 	private static void onItemSelectedp(int input) {
 		StringBuffer output = new StringBuffer();
@@ -429,5 +476,28 @@ public class XSofiaTweaker implements IXposedHookZygoteInit, IXposedHookLoadPack
 			context.startActivity(intent);
 		}
 	}
+/**********************************************************************************************************************************************/
+/*  Functions above are for the hardware buttons */
+/**********************************************************************************************************************************************/
+/*  Functions below are for the usbdac Volume control */
+/* Top one is a modified call. The seconda completely new type of function */
 
+	public static void setMediaVol(int vol) {
+		//AudioManager am = ObjApp.getAudioManager();
+		//am.setStreamVolume(3, am.getStreamVolume(3) + vol, 1);
+		return;
+	}
+	public static void setMuteVol() {
+		/*AudioManager am = ObjApp.getAudioManager();
+		am.adjustStreamVolume(0, 101, 0);
+		am.adjustStreamVolume(1, 101, 0);
+		am.adjustStreamVolume(2, 101, 0);
+		am.adjustStreamVolume(3, 101, 0);
+		am.adjustStreamVolume(4, 101, 0);
+		am.adjustStreamVolume(5, 101, 0);
+		am.adjustStreamVolume(6, 101, 0); */
+		return;
+	}
+
+/* End of it all *****************************************************************************************************************************/
 }

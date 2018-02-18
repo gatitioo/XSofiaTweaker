@@ -23,8 +23,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     @Override
 
     public void onAttach(Activity activity) {
-//    public void onAttach(Context mContext) {
-//        super.onAttach(mContext);
 	super.onAttach(activity);
         mContext = activity;
     }
@@ -79,6 +77,11 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
                 intent.setAction(MySettings.ACTION_PREF_SKIP_CH_FOUR_CHANGED);
                 intent.putExtra(MySettings.EXTRA_PREF_SKIP_CH_FOUR_ENABLED, sharedPreferences.getBoolean(key, false));
 		toastText = "PREF_SKIP_CH_FOUR";
+                break;
+            case MySettings.ENABLE_USB_DAC:
+                intent.setAction(MySettings.ACTION_ENABLE_USB_DAC_CHANGED);
+                intent.putExtra(MySettings.EXTRA_ENABLE_USB_DAC_ENABLED, sharedPreferences.getBoolean(key, false));
+		toastText = "ENABLE_USB_DAC";
                 break;
 	    case MySettings.NAVI_CALL_OPTION:
                 intent.setAction(MySettings.ACTION_NAVI_CALL_OPTION_CHANGED);

@@ -6,6 +6,8 @@
 	<string name="nokill_sum">Switched on it will prevent the unit from killing all apps on going into deep-sleep</string>
 	<string name="skip_ch_four_title">Switch Channel 4 (alarm) option on or off</string>
 	<string name="skip_ch_four_sum">Switched on it will prevent the unit from muting channel 4. This will enable voice feedback from Google Voice. It will also generate noise when no other channel is active.</string>
+	<string name="enable_usb_dac_title">Block Joying volume control and enable volume control over USB DAC.</string>
+	<string name="enable_usb_dac_sum">It stops Joying\'s software from changing any of the volumes and it also allows Joying\'s physical volume knob/buttons to change Android\'s media volume which in turn should allow usb dacs to work as intended.</string>
 
 	<string name="app_keymod_settings">Settings for the different application hardware keys</string>
 	<string name="bt_phone_key_settings">Settings for the BT_PHONE key</string>
