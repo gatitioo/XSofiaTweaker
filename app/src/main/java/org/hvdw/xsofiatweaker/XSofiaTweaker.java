@@ -14,6 +14,8 @@ import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.app.AndroidAppHelper;
 import android.widget.Toast;
+import android.media.AudioManager;
+import android.app.Application;
 
 
 import de.robv.android.xposed.XposedBridge;
@@ -30,6 +32,8 @@ public class XSofiaTweaker implements IXposedHookZygoteInit, IXposedHookLoadPack
 	public static Context mContext;
 	private static PackageManager pm;
 	public static XSharedPreferences pref;
+
+	private static AudioManager sAudioManager;
 
 	private boolean noKillEnabled;
 	private boolean skip_ch_four;
@@ -99,6 +103,10 @@ public class XSofiaTweaker implements IXposedHookZygoteInit, IXposedHookLoadPack
 		home_call_entry = sharedPreferences.getString(MySettings.HOME_CALL_ENTRY, "");
 	}
 
+
+	public static void init(Application app) {
+		sAudioManager = (AudioManager) app.getSystemService("audio");
+	}
 
 	public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
 		XposedBridge.log(TAG + " Loaded app: " + lpparam.packageName);
@@ -482,21 +490,26 @@ public class XSofiaTweaker implements IXposedHookZygoteInit, IXposedHookLoadPack
 /*  Functions below are for the usbdac Volume control */
 /* Top one is a modified call. The seconda completely new type of function */
 
+	public static AudioManager getAudioManager() {
+		return sAudioManager;
+	}
+
+
 	public static void setMediaVol(int vol) {
-		//AudioManager am = ObjApp.getAudioManager();
-		//am.setStreamVolume(3, am.getStreamVolume(3) + vol, 1);
-		return;
+		AudioManager am = getAudioManager();
+		am.setStreamVolume(3, am.getStreamVolume(3) + vol, 1);
+		//return;
 	}
 	public static void setMuteVol() {
-		/*AudioManager am = ObjApp.getAudioManager();
+		AudioManager am = getAudioManager();
 		am.adjustStreamVolume(0, 101, 0);
 		am.adjustStreamVolume(1, 101, 0);
 		am.adjustStreamVolume(2, 101, 0);
 		am.adjustStreamVolume(3, 101, 0);
 		am.adjustStreamVolume(4, 101, 0);
 		am.adjustStreamVolume(5, 101, 0);
-		am.adjustStreamVolume(6, 101, 0); */
-		return;
+		am.adjustStreamVolume(6, 101, 0);
+		//return;
 	}
 
 /* End of it all *****************************************************************************************************************************/
