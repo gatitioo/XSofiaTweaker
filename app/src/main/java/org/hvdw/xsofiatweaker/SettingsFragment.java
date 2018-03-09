@@ -187,7 +187,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         }
 
 	Log.d(TAG, "updated key is " + key);
-	if ((toastText.equals("PREF_NO_KILL")) || (toastText.equals("PREF_SKIP_CH_FOUR")) || (toastText.equals("HOME_KEY_CAPTURE"))) {
+	if ((toastText.equals("PREF_NO_KILL")) || (toastText.equals("PREF_SKIP_CH_FOUR")) || (toastText.equals("HOME_KEY_CAPTURE")) || (toastText.equals("ENABLE_USB_DAC"))) {
 		toastText = "You updated boolean key \"" + toastText + "\" to value \"" + String.valueOf(sharedPreferences.getBoolean(key, false)) + "\"";
 	} else {
 		Log.d(TAG, "updated string is " + sharedPreferences.getString(key, ""));
