@@ -156,7 +156,6 @@ public class XSofiaTweaker implements IXposedHookZygoteInit, IXposedHookLoadPack
 					}
 				});
 			}
-
 			/* the skip_ch_four does one thing and then needs to skip the function
 			/* the enable_usb_dac only needs to skip the function */
 			if ((pref_enable_usb_dac == true) || (skip_ch_four == false)){
@@ -172,7 +171,7 @@ public class XSofiaTweaker implements IXposedHookZygoteInit, IXposedHookLoadPack
 
 		/* The enable_usb_dac skip/uses 4 functions. The one above and the 3 below */
 		if (pref_enable_usb_dac == true) {
-			findAndHookMethod("module.main.HandlerMain", lpparam.classLoader, "mcuKeyVolUp()", new XC_MethodHook() {
+			findAndHookMethod("module.main.HandlerMain", lpparam.classLoader, "mcuKeyVolUp", new XC_MethodHook() {
 				@Override
 				protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
 					setMediaVol(1);
@@ -180,7 +179,7 @@ public class XSofiaTweaker implements IXposedHookZygoteInit, IXposedHookLoadPack
 				}
 			});
 
-			findAndHookMethod("module.main.HandlerMain", lpparam.classLoader, "mcuKeyVolDown()", new XC_MethodHook() {
+			findAndHookMethod("module.main.HandlerMain", lpparam.classLoader, "mcuKeyVolDown", new XC_MethodHook() {
 				@Override
 				protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
 					setMediaVol(-1);
