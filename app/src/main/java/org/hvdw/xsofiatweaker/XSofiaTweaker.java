@@ -16,6 +16,7 @@ import android.app.AndroidAppHelper;
 import android.widget.Toast;
 import android.media.AudioManager;
 import android.app.Application;
+import android.media.AudioManager;
 
 
 import de.robv.android.xposed.XposedBridge;
@@ -162,14 +163,13 @@ public class XSofiaTweaker implements IXposedHookZygoteInit, IXposedHookLoadPack
 				findAndHookMethod("app.ToolkitApp", lpparam.classLoader, "setStreamVol", int.class, int.class, new XC_MethodHook() {
 					@Override
 					protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
-
-							param.setResult(null);
+						param.setResult(null);
 					}
 				});
 			}
 		}
 
-		/* The enable_usb_dac skip/uses 4 functions. The one above and the 3 below */
+		/* The enable_usb_dac skips/uses 4 functions. The one above and the 3 below */
 		if (pref_enable_usb_dac == true) {
 			findAndHookMethod("module.main.HandlerMain", lpparam.classLoader, "mcuKeyVolUp", new XC_MethodHook() {
 				@Override
@@ -188,7 +188,7 @@ public class XSofiaTweaker implements IXposedHookZygoteInit, IXposedHookLoadPack
 			});
 
 			/* Note that the MUTE hardware button overrules this function */
-			findAndHookMethod("module.main.HandlerMain", lpparam.classLoader, "mcuKeyVolMute()", new XC_MethodHook() {
+			findAndHookMethod("module.main.HandlerMain", lpparam.classLoader, "mcuKeyVolMute", new XC_MethodHook() {
 				@Override
 				protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
 					setMuteVol();
